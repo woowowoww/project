@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Main page</title>
+  <style>
+    * {
+      margin: 0;
+      padding:0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f2f5;
+    }
+
+    .container {
+      margin-top: 5vh;
+      text-align: center;
+    }
+
+    .site-title {
+      font-size: 3.5rem;
+      color: #1a73e8;
+      margin-bottom: 30px;
+      font-family: Arial, sans-serif;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-container {
+      width: 600px;
+      max-width: 90%;
+      margin: 0 auto;
+    }
+    .category-select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 16px;
+      color: #5f6368;
+      padding-right: 16px;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right center;
+      cursor: pointer;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      border: 2px solid #dfe1e5;
+      border-radius: 30px;
+      padding: 10px 20px;
+      background-color: white;
+      transition: all 0.3s ease;
+      gap:10px;
+    }
+
+    .search-box:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 8px;
+      background: transparent;
+    }
+
+    .search-button {
+      background: none;
+      border: none;
+      border-radius:5px ;
+      cursor: pointer;
+      padding: 8px;
+      margin-left: 10px;
+    }
+
+    .search-button img {
+      width: 24px;
+      height: 24px;
+    }
+    .search-button:hover {
+      opacity:0.5;
+    }
+
+    @media (max-width: 768px) {
+      .site-title {
+        font-size: 2.5rem;
+      }
+
+      .search-container {
+        width: 90%;
+      }
+      .category-select {
+        width: 40%;
+      }
+      .search-input {
+        width: 60%;
+      }
+    }
+    .autocomplete-box {
+      position: absolute;
+      background: white;
+      border: 1px solid #ddd;
+      width: 100px;
+      max-width: 90%;
+      margin-top: 65px;
+      margin-left: 130px;
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    .autocomplete-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .autocomplete-item:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="site-title">Online Shopping</h1>
+  <div class="search-container">
+    <div class="autocomplete-box" id="autocompleteBox" style="display: none;"></div>
+    <div class="search-box">
+      <select class="category-select">
+        <option>All Products</option>
+        <option>Display Card</option>
+        <option>CPU</option>
+        <option>Mouse</option>
+        <option>Keyboard</option>
+      </select>
+      <input type="text" class="search-input" placeholder="Search Online Shopping">
+      <button class="search-button">
+        <img src="https://img.icons8.com/ios-filled/50/1a73e8/search--v1.png" alt="Searching">
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const products = [
+    'product 1', 'product 2', 'product 3', 'product 4',
+    'product 5', 'product 6', 'product 7', 'product 8'
+  ];
+
+  document.querySelector('.search-button').addEventListener('click', function() {
+    const searchInput = document.querySelector('.search-input').value.trim();
+    const category = document.querySelector('.category-select').value;
+    const url = `Index.html?search=${encodeURIComponent(searchInput)}`;
+    window.location.href = url;
+  });
+
+  const searchInput = document.querySelector('.search-input');
+  const autocompleteBox = document.getElementById('autocompleteBox');
+
+  searchInput.addEventListener('input', function(e) {
+    const value = e.target.value.trim().toLowerCase();
+    autocompleteBox.innerHTML = '';
+    autocompleteBox.style.display = value ? 'block' : 'none';
+
+    if (value) {
+      const matches = products.filter(product =>
+        product.toLowerCase().includes(value)
+      );
+      matches.forEach(match => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.textContent = match;
+        item.addEventListener('click', () => {
+          searchInput.value = match;
+          autocompleteBox.style.display = 'none';
+        });
+        autocompleteBox.appendChild(item);
+      });
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-box')) {
+      autocompleteBox.style.display = 'none';
+    }
+  });
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Payment</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    #header {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #header a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    #payment-container {
+        margin-top: 20px;
+    }
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    .order-item span {
+        font-size: 16px;
+    }
+    .total {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 20px;
+        text-align: right;
+    }
+    .order-details {
+        margin-bottom: 20px;
+    }
+    .payment-methods {
+        margin-top: 20px;
+    }
+    .payment-methods label {
+        margin-right: 20px;
+        font-size: 16px;
+    }
+    .payment-details {
+        margin-top: 20px;
+        display: none;
+    }
+    #credit-card-details input {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    #credit-card-details .card-number-container {
+        position: relative;
+    }
+    #credit-card-details .row {
+        display: flex;
+        justify-content: space-between;
+    }
+    #credit-card-details .row input {
+        width: 48%;
+    }
+    #credit-card-details .cvv-container {
+        display: flex;
+        align-items: center;
+    }
+    #credit-card-details button {
+        background-color: #4A90E2;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 10px;
+    }
+    #credit-card-details button:hover {
+        background-color: #357ABD;
+    }
+    #wechat-details, #alipay-details {
+        text-align: center;
+    }
+    #wechat-details img, #alipay-details img {
+        width: 300px;
+        height: 300px;
+        margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+<div id="header">
+  <div id="header_left">Electronic Goods Sales Website</div>
+  <div id="header_right"><a href="Index.html">Back to Shopping</a></div>
+</div>
+<div id="payment-container">
+  <h2>Order Summary</h2>
+  <div id="order-details" class="order-details"></div>
+  <div id="order-items"></div>
+  <div class="total" id="order-total"></div>
+  <div class="payment-methods">
+    <h3>Select Payment Method</h3>
+    <label><input type="radio" name="payment-method" value="credit-card" onchange="showPaymentDetails()"> Credit Card</label>
+    <label><input type="radio" name="payment-method" value="wechat" onchange="showPaymentDetails()"> WeChat Pay</label>
+    <label><input type="radio" name="payment-method" value="alipay" onchange="showPaymentDetails()"> Alipay Hong Kong</label>
+  </div>
+  <div id="credit-card-details" class="payment-details">
+    <h3>Credit Card Payment</h3>
+    <div class="card-number-container">
+      <input type="text" id="card-number" placeholder="Card number">
+    </div>
+    <input type="text" id="card-name" placeholder="Name on card (Ex. Chan Tai Man)">
+    <div class="row">
+      <input type="text" id="expiry-date" placeholder="Expiry date (MM/YY)">
+      <div class="cvv-container">
+        <input type="text" id="security-code" placeholder="CVV" style="width: 60%;">
+      </div>
+    </div>
+    <button onclick="processPayment()">Next</button>
+  </div>
+  <div id="wechat-details" class="payment-details">
+    <h3>WeChat Pay</h3>
+    <p>Scan the QR code below to pay with WeChat Pay:</p>
+    <img src="https://placehold.co/300x300?text=WeChat+QR+Code" alt="WeChat QR Code">
+  </div>
+  <div id="alipay-details" class="payment-details">
+    <h3>Alipay Hong Kong</h3>
+    <p>Scan the QR code below to pay with Alipay Hong Kong:</p>
+    <img src="https://placehold.co/300x300?text=Alipay+QR+Code" alt="Alipay QR Code">
+  </div>
+</div>
+<script>
+  function displayOrder() {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      let discountApplied = localStorage.getItem('discountApplied') === 'true';
+      let username = localStorage.getItem('loggedInUser') || 'Guest';
+      let orderTime = localStorage.getItem('orderTime') || new Date().toLocaleString();
+      localStorage.setItem('orderTime', orderTime);
+      let orderDetailsDiv = document.getElementById('order-details');
+      let orderItemsDiv = document.getElementById('order-items');
+      let orderTotalDiv = document.getElementById('order-total');
+      orderDetailsDiv.innerHTML = '<p><strong>Username:</strong> ' + username + '</p><p><strong>Order Created:</strong> ' + orderTime + '</p>';
+      orderItemsDiv.innerHTML = '';
+      if (cart.length === 0) {
+          orderItemsDiv.innerHTML = '<p>No items in the order.</p>';
+          orderTotalDiv.textContent = 'Total: $0';
+          return;
+      }
+      let total = 0;
+      cart.forEach(function(item) {
+          let itemDiv = document.createElement('div');
+          itemDiv.className = 'order-item';
+          itemDiv.innerHTML = '<span>' + item.name + '</span><span>$' + item.price + ' x ' + (item.quantity || 1) + '</span><span>$' + (item.price * (item.quantity || 1)).toFixed(2) + '</span>';
+          orderItemsDiv.appendChild(itemDiv);
+          total += item.price * (item.quantity || 1);
+      });
+      if (discountApplied) {
+          total *= 0.95;
+          orderDetailsDiv.innerHTML += '<p><strong>Discount Applied:</strong> 5% off (Code: OFF05OFF)</p>';
+      }
+      orderTotalDiv.textContent = 'Total: $' + total.toFixed(2);
+  }
+  function showPaymentDetails() {
+      let selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+      document.getElementById('credit-card-details').style.display = 'none';
+      document.getElementById('wechat-details').style.display = 'none';
+      document.getElementById('alipay-details').style.display = 'none';
+      if (selectedMethod === 'credit-card') document.getElementById('credit-card-details').style.display = 'block';
+      else if (selectedMethod === 'wechat') document.getElementById('wechat-details').style.display = 'block';
+      else if (selectedMethod === 'alipay') document.getElementById('alipay-details').style.display = 'block';
+  }
+  function processPayment() {
+      let selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+      if (!selectedMethod) {
+          alert('Please select a payment method!');
+          return;
+      }
+      if (selectedMethod === 'credit-card') {
+          let cardNumber = document.getElementById('card-number').value.trim();
+          let cardName = document.getElementById('card-name').value.trim();
+          let expiryDate = document.getElementById('expiry-date').value.trim();
+          let securityCode = document.getElementById('security-code').value.trim();
+          if (!cardNumber || !cardName || !expiryDate || !securityCode) {
+              alert('Please fill in all credit card details!');
+              return;
+          }
+      }
+      alert('Payment processed successfully!');
+      localStorage.removeItem('cart');
+      localStorage.removeItem('discountApplied');
+      localStorage.removeItem('orderTime');
+      window.location.href = 'index.html';
+  }
+  displayOrder();
+</script>
+</body>
+</html>

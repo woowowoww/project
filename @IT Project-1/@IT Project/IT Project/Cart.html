@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Your Cart</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    #header {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #header a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    #cart-container {
+        margin-top: 20px;
+    }
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    .cart-item span {
+        font-size: 16px;
+    }
+    .quantity-input {
+        width: 50px;
+        padding: 5px;
+        margin-left: 10px;
+    }
+    .total {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 20px;
+        text-align: right;
+    }
+    .discount-container {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+    }
+    .discount-container input {
+        padding: 5px;
+        margin-right: 10px;
+    }
+    button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 10px 0;
+    }
+    button:hover {
+        background-color: #218838;
+    }
+    #clear-cart {
+        background-color: #ff4444;
+    }
+    #clear-cart:hover {
+        background-color: #cc0000;
+    }
+    #payment-btn {
+        float: right;
+    }
+  </style>
+</head>
+<body>
+<div id="header">
+  <div id="header_left">Electronic Goods Sales Website</div>
+  <div id="header_right"><a href="index.html">Back to Shopping</a></div>
+</div>
+<div id="cart-container">
+  <h2>Your Cart</h2>
+  <div id="cart-items"></div>
+  <div class="discount-container">
+    <input type="text" id="discount-code" placeholder="Enter discount code">
+    <button onclick="applyDiscount()">Apply</button>
+  </div>
+  <div class="total" id="cart-total">Total: $0</div>
+  <button onclick="clearCart()" id="clear-cart">Clear Cart</button>
+  <button onclick="proceedToPayment()" id="payment-btn">Proceed to Payment</button>
+</div>
+<script>
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  let discountApplied = false;
+  function displayCart() {
+      let cartItemsDiv = document.getElementById('cart-items');
+      let cartTotalDiv = document.getElementById('cart-total');
+      cartItemsDiv.innerHTML = '';
+      if (cart.length === 0) {
+          cartItemsDiv.innerHTML = '<p>Your cart is empty.</p>';
+          cartTotalDiv.textContent = 'Total: $0';
+          return;
+      }
+      let total = 0;
+      cart.forEach(function(item, index) {
+          let itemDiv = document.createElement('div');
+          itemDiv.className = 'cart-item';
+          itemDiv.innerHTML = '<span>' + item.name + '</span><span>$' + item.price + ' x <input type="number" class="quantity-input" min="1" value="' + (item.quantity || 1) + '" onchange="updateQuantity(' + index + ', this.value)"></span><span>$' + (item.price * (item.quantity || 1)).toFixed(2) + '</span>';
+          cartItemsDiv.appendChild(itemDiv);
+          total += item.price * (item.quantity || 1);
+      });
+      if (discountApplied) total *= 0.95;
+      cartTotalDiv.textContent = 'Total: $' + total.toFixed(2);
+  }
+  function updateQuantity(index, value) {
+      cart[index].quantity = parseInt(value) || 1;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+  }
+  function applyDiscount() {
+      let code = document.getElementById('discount-code').value.trim();
+      if (code === 'OFF05OFF') {
+          discountApplied = true;
+          alert('Discount applied: 5% off!');
+      } else {
+          discountApplied = false;
+          alert('Invalid discount code!');
+      }
+      displayCart();
+  }
+  function clearCart() {
+      localStorage.removeItem('cart');
+      cart = [];
+      discountApplied = false;
+      displayCart();
+      alert('Cart cleared!');
+  }
+  function proceedToPayment() {
+      if (cart.length === 0) {
+          alert('Your cart is empty!');
+          return;
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      localStorage.setItem('discountApplied', discountApplied);
+      window.location.href = 'payment.html';
+  }
+  displayCart();
+</script>
+</body>
+</html>

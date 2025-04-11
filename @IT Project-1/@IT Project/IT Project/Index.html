@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Online Shopping Platform</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    .sidebar {
+        width: 300px;
+        padding: 10px;
+        border-right: 1px solid #ccc;
+    }
+    .section-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .filter-option {
+        margin-top: 20px;
+    }
+    .filter-option label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    .filter-option input[type="range"] {
+        width: 100%;
+    }
+    .filter-value {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .collapsible {
+        cursor: pointer;
+        padding: 10px;
+        border: none;
+        text-align: left;
+        font-size: 15px;
+    }
+    .content {
+        display: none;
+        overflow: hidden;
+        padding: 0 10px;
+        border-top: 10px solid #ffffff;
+    }
+    .collapsible:after {
+        content: '+';
+        float: right;
+    }
+    .active:after {
+        content: '-';
+    }
+    .range-slider {
+        position: relative;
+        width: 100%;
+    }
+    .range-slider input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 10px;
+        background: #ddd;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 10px;
+        height: 15px;
+        border-radius: 30%;
+        background: #6137af;
+        cursor: pointer;
+    }
+    .range-slider input[type="range"]::-moz-range-thumb {
+        width: 10px;
+        height: 15px;
+        border-radius: 30%;
+        background: #4154be;
+        cursor: pointer;
+    }
+    .range-slider input[type="range"]::-ms-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #383ab8;
+        cursor: pointer;
+    }
+    #header {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #header a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        margin-left: 15px;
+    }
+    #sidebar {
+        width: 15%;
+        background-color: #f4f4f4;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    #productPage {
+        width: 85%;
+    }
+    #homePage {
+        display: flex;
+    }
+    .product {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        max-width: 250px;
+        margin: 30px;
+        text-align: center;
+        font-family: Arial;
+        font-size: medium;
+        float: left;
+    }
+    .price {
+        text-align: center;
+        font-size: medium;
+        color: rgba(247, 25, 4, 0.832);
+    }
+    .product button {
+        border: none;
+        outline: 0;
+        padding: 12px;
+        color: white;
+        background-color: #000;
+        text-align: center;
+        cursor: pointer;
+        width: 100%;
+        font-size: 18px;
+    }
+    .product button:hover {
+        opacity: 0.7;
+    }
+    .hidden {
+        display: none;
+    }
+    #login-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        display: none;
+    }
+    .popup-content {
+        background-color: white;
+        padding: 30px 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        width: 320px;
+        text-align: center;
+        position: relative;
+    }
+    .close-popup {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+    .error-message {
+        color: #ff4444;
+        font-size: 12px;
+        height: 14px;
+        margin: 5px 0 10px;
+        text-align: left;
+    }
+    .input-container {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
+    button:hover {
+        background-color: #218838;
+    }
+    #confirm-password-container {
+        display: none;
+    }
+    .toggle-password {
+        cursor: pointer;
+        font-size: 14px;
+        color: #007bff;
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div id="header">
+  <div id="header_left">Electronic Goods Sales Website</div>
+  <div id="header_right"></div>
+</div>
+<div id="homePage">
+  <div class="sidebar">
+    <div>
+      <div class="section-title">Browse by</div>
+      <ul>
+        <li><a href="#">All Products</a></li>
+        <li><a href="#">Display Card</a></li>
+        <li><a href="#">CPU</a></li>
+        <li><a href="#">Mouse</a></li>
+        <li><a href="#">Keyboard</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="section-title">Filter options</div>
+      <div class="filter-option">
+        <button class="collapsible">Price</button>
+        <div class="content">
+          <div class="range-slider">
+            <input type="range" min="399" max="9999" value="399" id="minPriceRange">
+            <input type="range" min="399" max="9999" value="9999" id="maxPriceRange">
+          </div>
+          <div class="filter-value">
+            <span id="minPrice">HK$399</span>
+            <span id="maxPrice">HK$9999</span>
+          </div>
+        </div>
+      </div>
+      <div class="filter-option">
+        <button class="collapsible">AMD</button>
+        <div class="content"></div>
+      </div>
+      <div class="filter-option">
+        <button class="collapsible">NVIDIA</button>
+        <div class="content"></div>
+      </div>
+      <div class="filter-option">
+        <button class="collapsible">Microsoft</button>
+        <div class="content"></div>
+      </div>
+      <div class="filter-option">
+        <button class="collapsible">Logitech</button>
+        <div class="content"></div>
+      </div>
+    </div>
+  </div>
+  <div id="productPage">
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 3050.jpg" alt="GeForce RTX 3050" width="250" height="250">
+      <h2>GeForce RTX 3050</h2>
+      <p class="price">$30</p>
+      <p><button onclick="addToCart('GeForce RTX 3050', 30)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 3070.png" alt="GeForce RTX 3070" width="250" height="250">
+      <h2>GeForce RTX 3070</h2>
+      <p class="price">$60</p>
+      <p><button onclick="addToCart('GeForce RTX 3070', 60)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 4060.png" alt="GeForce RTX 4060" width="250" height="250">
+      <h2>GeForce RTX 4060</h2>
+      <p class="price">$90</p>
+      <p><button onclick="addToCart('GeForce RTX 4060', 90)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 4070.png" alt="GeForce RTX 4070" width="250" height="250">
+      <h2>GeForce RTX 4070</h2>
+      <p class="price">$120</p>
+      <p><button onclick="addToCart('GeForce RTX 4070', 120)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 5070.png" alt="GeForce RTX 5070" width="250" height="250">
+      <h2>GeForce RTX 5070</h2>
+      <p class="price">$150</p>
+      <p><button onclick="addToCart('GeForce RTX 5070', 150)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Display Card/GeForce RTX 5080.webp" alt="GeForce RTX 5080" width="250" height="250">
+      <h2>GeForce RTX 5080</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('GeForce RTX 5080', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i5-11400.webp" alt="i5-11400" width="250" height="250">
+      <h2>i5-11400</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i5-11400', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i5-13600K.jpg" alt="i5-13600K" width="250" height="250">
+      <h2>i5-13600K</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i5-13600K', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i7-12700K.webp" alt="i7-12700K" width="250" height="250">
+      <h2>i7-12700K</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i7-12700K', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i7-13700KF.jpg" alt="i7-13700KF" width="250" height="250">
+      <h2>i7-13700KF</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i7-13700KF', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i9-12900.png" alt="i9-12900" width="250" height="250">
+      <h2>i9-12900</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i9-12900', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/CPU/i9-14900K.webp" alt="i9-14900K" width="250" height="250">
+      <h2>i9-14900K</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('i9-14900K', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/G PRO Wireless.webp" alt="G PRO Wireless" width="250" height="250">
+      <h2>G PRO Wireless</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('G PRO Wireless', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/G304.jpg" alt="G304" width="250" height="250">
+      <h2>G304</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('G304', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/G502.jpg" alt="G502" width="250" height="250">
+      <h2>G502</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('G502', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/M650.webp" alt="M650" width="250" height="250">
+      <h2>M650</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('M650', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/MX Master 3S.avif" alt="MX Master 3S" width="250" height="250">
+      <h2>MX Master 3S</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('MX Master 3S', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/Mouse/MX Vertical.webp" alt="MX Vertical" width="250" height="250">
+      <h2>MX Vertical</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('MX Vertical', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/G Pro X.webp" alt="G Pro X" width="250" height="250">
+      <h2>G Pro X</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('G Pro X', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/G915 X.webp" alt="G915 X" width="250" height="250">
+      <h2>G915 X</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('G915 X', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/K780.webp" alt="K780 width="250" height="250">
+      <h2>K780</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('K780', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/MX Keys Mini.webp" alt="MX Keys Mini" width="250" height="250">
+      <h2>MX Keys Mini</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('MX Keys Mini', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/MX KEYS S.webp" alt="MX KEYS S" width="250" height="250">
+      <h2>MX KEYS S</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('MX KEYS S', 180)">Add to Cart</button></p>
+    </div>
+    <div class="product">
+      <img src="product/KeyBoard/Pop Keys.webp" alt="Pop Keys" width="250" height="250">
+      <h2>Pop Keys</h2>
+      <p class="price">$180</p>
+      <p><button onclick="addToCart('Pop Keys', 180)">Add to Cart</button></p>
+    </div>
+  </div>
+</div>
+<div id="login-popup" class="hidden">
+  <div class="popup-content">
+    <span class="close-popup" onclick="closePopup()">x</span>
+    <h2 id="popup-title">Login</h2>
+    <div class="error-message" id="popup-error"></div>
+    <div class="input-container">
+      <label for="popup-username">Username</label>
+      <input type="text" id="popup-username" placeholder="Username">
+    </div>
+    <div class="input-container">
+      <label for="popup-password">Password</label>
+      <input type="password" id="popup-password" placeholder="Password">
+      <span class="toggle-password" onclick="togglePassword('popup-password')">Show</span>
+    </div>
+    <div id="confirm-password-container" class="input-container">
+      <label for="popup-confirm-password">Confirm Password</label>
+      <input type="password" id="popup-confirm-password" placeholder="Confirm Password">
+      <span class="toggle-password" onclick="togglePassword('popup-confirm-password')">Show</span>
+    </div>
+    <button onclick="handleAuth()" id="popup-submit-btn">Login</button>
+    <p class="switch-mode">
+      <span id="switch-text">Don't have an account?</span>
+      <a onclick="toggleAuthMode()" id="switch-link">Sign Up</a>
+    </p>
+  </div>
+</div>
+<script>
+  let isRegisterMode = false;
+  let registeredUsers = JSON.parse(localStorage.getItem('users') || '{}');
+  function togglePopup() {
+      document.getElementById('login-popup').style.display = 'flex';
+      resetForm();
+  }
+  function closePopup() {
+      document.getElementById('login-popup').style.display = 'none';
+      resetForm();
+  }
+  function resetForm() {
+      document.getElementById('popup-username').value = '';
+      document.getElementById('popup-password').value = '';
+      document.getElementById('popup-confirm-password').value = '';
+      document.getElementById('popup-error').textContent = '';
+      if (isRegisterMode) toggleAuthMode();
+  }
+  function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('confirm-password-container').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('popup-submit-btn').textContent = isRegisterMode ? 'Sign Up' : 'Login';
+      document.getElementById('popup-title').textContent = isRegisterMode ? 'Sign Up' : 'Login';
+      document.getElementById('switch-text').textContent = isRegisterMode ? 'Already have an account?' : 'Don\'t have an account?';
+      document.getElementById('switch-link').textContent = isRegisterMode ? 'Login' : 'Sign Up';
+      document.getElementById('popup-error').textContent = '';
+  }
+  function handleAuth() {
+      let username = document.getElementById('popup-username').value.trim();
+      let password = document.getElementById('popup-password').value.trim();
+      let confirmPassword = document.getElementById('popup-confirm-password').value.trim();
+      let errorEl = document.getElementById('popup-error');
+      if (!username || !password) {
+          errorEl.textContent = 'Please enter both username and password!';
+          return;
+      }
+      if (isRegisterMode) {
+          if (password !== confirmPassword) {
+              errorEl.textContent = 'Passwords do not match!';
+              return;
+          }
+          if (registeredUsers[username]) {
+              errorEl.textContent = 'Username already exists!';
+              return;
+          }
+          registeredUsers[username] = password;
+          localStorage.setItem('users', JSON.stringify(registeredUsers));
+          alert('Registration successful!');
+          toggleAuthMode();
+      } else {
+          if (!registeredUsers[username]) {
+              errorEl.textContent = 'Username does not exist!';
+              return;
+          }
+          if (registeredUsers[username] !== password) {
+              errorEl.textContent = 'Incorrect password!';
+              return;
+          }
+          localStorage.setItem('loggedInUser', username);
+          closePopup();
+          updateHeader();
+          alert(`Welcome back, ${username}!`);
+      }
+      resetForm();
+  }
+  function updateHeader() {
+      let headerRight = document.getElementById('header_right');
+      let loggedInUser = localStorage.getItem('loggedInUser');
+      if (loggedInUser) {
+          headerRight.innerHTML = `<a href="javascript:void(0)" onclick="goToCart()">Cart</a> | Welcome, ${loggedInUser} | <a onclick="logout()">Logout</a>`;
+      } else {
+          headerRight.innerHTML = '<a onclick="togglePopup()">Login</a>';
+      }
+  }
+  function logout() {
+      localStorage.removeItem('loggedInUser');
+      updateHeader();
+      alert('You have been logged out!');
+  }
+  function togglePassword(inputId) {
+      let inputField = document.getElementById(inputId);
+      let inputType = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
+      inputField.setAttribute('type', inputType);
+  }
+  function addToCart(productName, price) {
+      let loggedInUser = localStorage.getItem('loggedInUser');
+      if (!loggedInUser) {
+          alert('Please log in to add items to your cart!');
+          togglePopup();
+          return;
+      }
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.push({name: productName, price: price});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.location.href = 'cart.html';
+  }
+  function goToCart() {
+      let loggedInUser = localStorage.getItem('loggedInUser');
+      if (!loggedInUser) {
+          alert('Please log in to view your cart!');
+          togglePopup();
+          return;
+      }
+      window.location.href = 'cart.html';
+  }
+  updateHeader();
+  document.getElementById('login-popup').addEventListener('click', function(e) {
+      if (e.target === document.getElementById('login-popup')) closePopup();
+  });
+  document.querySelectorAll('.collapsible').forEach(function(button) {
+      button.addEventListener('click', function() {
+          button.classList.toggle('active');
+          let content = button.nextElementSibling;
+          if(content.style.display === "block") content.style.display = "none";
+          else content.style.display = "block";
+      });
+  });
+  var minPriceRange = document.getElementById('minPriceRange');
+  var maxPriceRange = document.getElementById('maxPriceRange');
+  var minPriceLabel = document.getElementById('minPrice');
+  var maxPriceLabel = document.getElementById('maxPrice');
+  minPriceRange.oninput = function() {
+      if (parseInt(minPriceRange.value) > parseInt(maxPriceRange.value)) minPriceRange.value = maxPriceRange.value;
+      minPriceLabel.innerHTML = 'HK$' + minPriceRange.value;
+  };
+  maxPriceRange.oninput = function() {
+      if (parseInt(maxPriceRange.value) < parseInt(minPriceRange.value)) maxPriceRange.value = minPriceRange.value;
+      maxPriceLabel.innerHTML = 'HK$' + maxPriceRange.value;
+  };
+</script>
+</body>
+</html>
